@@ -1,0 +1,54 @@
+server:
+  port: 8080
+
+spring:
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        acknowledge-mode: manual
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: payments_db
+    redis:
+      host: redis
+      port: 6379
+
+cloud:
+  aws:
+    credentials:
+      access-key: xy
+      secret-key: xx
+    region:
+      static: us-east-1
+    sns:
+      topic:
+        arn: arn:aws:sns:us-east-1:529025971143:payment-events
+    sqs:
+      queues:
+        payment-processing: https://sqs.us-east-1.amazonaws.com/529025971143/payment-processing
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+
+logging:
+  level:
+    root: INFO
+    com.example.payment: DEBUG
+    org.springframework.cloud.aws.messaging.listener: DEBUG
