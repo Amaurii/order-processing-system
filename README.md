@@ -1,12 +1,14 @@
 # 🛒 Order Processing System 🚀
 **Gerenciamento de pedidos com arquitetura escalável, mensageria e banco NoSQL**
 
+
 ![Java](https://img.shields.io/badge/Java-17-blue?style=flat&logo=java)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.0-brightgreen?style=flat&logo=spring)
 ![MongoDB](https://img.shields.io/badge/MongoDB-NoSQL-brightgreen?style=flat&logo=mongodb)
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-Message%20Queue-orange?style=flat&logo=rabbitmq)
 ![Redis](https://img.shields.io/badge/Redis-Cache-red?style=flat&logo=redis)
 ---
+
 
 ## 📖 Sobre o Projeto
 O **Order Processing System** é um **microserviço** para gerenciamento de pedidos com um fluxo assíncrono e escalável. Ele recebe pedidos, armazena no **MongoDB** e publica no **RabbitMQ** para processamento. Também utiliza **Redis** para evitar duplicidade de pedidos.
@@ -21,7 +23,7 @@ O **Order Processing System** é um **microserviço** para gerenciamento de pedi
 
 🛠️ **Diagrama da Arquitetura**
 ```
-[ Serviço Externo A ] ---> [ RabbitMQ ] ---> [ order-service ] ---> [ MongoDB ] --> [ Serviço Externo B ]
+[ Serviço Externo A ] ---> [ order-service ] + [ RabbitMQ ]  ---> [ MongoDB ] --> [ Serviço Externo B ]
 ```
 
 ## 🚀 **Tecnologias Utilizadas**
