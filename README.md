@@ -36,7 +36,7 @@ O **Order Processing System** é um **microserviço** para gerenciamento de pedi
 ## 🛠 **Como Rodar o Projeto?**
 ### 🔹 **1. Clonar o Repositório**
 ```bash
-git clone https://github.com/seu-usuario/order-processing-system.git
+git git@github.com:Amaurii/order-processing-system.git
 cd order-processing-system
 
 docker-compose up -d
