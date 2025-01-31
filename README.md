@@ -19,10 +19,10 @@ O **Order Processing System** é um **microserviço** para gerenciamento de pedi
 - **RabbitMQ** para comunicação assíncrona via filas de mensagens.
 - **Redis** para controle de duplicidade e caching.
 
-🛠️ **Diagrama da Arquitetura**  
-
-
----
+🛠️ **Diagrama da Arquitetura**
+```
+[ Serviço Externo A ] ---> [ RabbitMQ ] ---> [ order-service ] ---> [ MongoDB ] --> [ Serviço Externo B ]
+```
 
 ## 🚀 **Tecnologias Utilizadas**
 - **Linguagem**: Java 17
