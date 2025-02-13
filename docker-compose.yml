@@ -9,7 +9,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/payments_db
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/orders_db
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
       SPRING_PROFILES_ACTIVE: docker
@@ -30,9 +30,9 @@ services:
     volumes:
       - mongo_data:/data/db
     environment:
-      MONGO_INITDB_DATABASE: payments_db
+      MONGO_INITDB_DATABASE: orders_db
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/payments_db --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/orders_db --quiet
       interval: 20s
       retries: 10
       start_period: 40s
@@ -58,7 +58,7 @@ services:
 
   redis:
     image: redis:latest
-    container_name: redis
+    container_name: redis_docker
     ports:
       - "6379:6379"
     restart: always

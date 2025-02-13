@@ -39,6 +39,7 @@ public class OrderConsumer {
     @RabbitListener(queues = ORDER_QUEUE)
     public void consumePayment(Order order, Channel channel, Message message) {
         try {
+            // 1. Validar o pedido antes de qualquer processamento
             Set<ConstraintViolation<Order>> violations = validator.validate(order);
             if (!violations.isEmpty()) {
                 StringBuilder errorMessages = new StringBuilder("Validation errors:");
@@ -47,32 +48,41 @@ public class OrderConsumer {
                 throw new IllegalArgumentException(errorMessages.toString());
             }
 
+            // 2. Verificar duplicidade no Redis antes de qualquer outra consulta
             if (orderCacheService.isOrderProcessed(order.getId())) {
-                System.out.println("Pedido duplicado detectado no Redis! Ignorando: " + order.getId());
+                logger.warn("Pedido duplicado detectado no Redis! Ignorando: {}", order.getId());
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false); // Confirma que a mensagem foi processada
                 return;
             }
 
-            Optional<Order> existingOrder = orderRepository.findById(order.getId());
-            if (existingOrder.isPresent()) {
-                System.out.println("Pedido duplicado detectado! Ignorando: " + order.getCustomerId());
+            // 3. Verificar duplicidade no banco
+            if (orderRepository.existsById(order.getId())) {
+                logger.warn("Pedido duplicado detectado no MongoDB! Ignorando: {}", order.getId());
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false); // Confirma que a mensagem foi processada
                 return;
             }
+
+            // 4. Salvar no banco primeiro
+            orderRepository.save(order);
+            logger.info("Order saved: {} - {}", order.getId(), order.getCustomerId());
+
+            // 5. Marcar o pedido como processado no Redis somente após persistência bem-sucedida
             orderCacheService.markOrderAsProcessed(order.getId());
 
-            orderRepository.save(order);
-            logger.info("Order saved: {}", order.getId() + " " + order.getCustomerId() + " " + order.getStatus());
-            successCounter.increment();
-
+            // 6. Confirmar a mensagem como processada com sucesso
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            successCounter.increment();
             logger.info("Order processed successfully: {}", order);
 
-        }catch (Exception e){
-                logger.error("Error processing order: {}", order, e);
+        } catch (Exception e) {
+            logger.error("Error processing order: {}", order, e);
             try {
-                channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);
+                // 7. Se houver erro, rejeita a mensagem e reencaminha para reprocessamento
+                channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
             } catch (IOException ioException) {
                 logger.error("Failed to reject message", ioException);
             }
         }
     }
+
 }
